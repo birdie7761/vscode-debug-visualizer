@@ -1,4 +1,4 @@
-import React = require("react");
+import * as React from "react";
 import { Model } from "../model/Model";
 import { observer, disposeOnUnmount } from "mobx-react";
 import { observable, action, autorun } from "mobx";
@@ -10,7 +10,7 @@ export class ExpressionInput extends React.Component<{ model: Model }> {
 	@observable private contentHeight: number | undefined = undefined;
 	private model = monaco.editor.createModel(
 		"",
-		"javascript",
+		"text",
 		monaco.Uri.parse(`file:///main.ts`)
 	);
 
@@ -76,13 +76,14 @@ export class ExpressionInput extends React.Component<{ model: Model }> {
 				horizontalScrollbarSize: 0,
 				verticalScrollbarSize: 0,
 			},
-			/*theme: { dark: "vs-dark", light: "vs-light" }[
-				this.props.model.theme
-			],*/
 		});
-		//
+
 		this.editor.onDidContentSizeChange(e => {
 			this.contentHeight = e.contentHeight;
+		});
+
+		this.editor.onDidBlurEditorText(() => {
+			this.submit();
 		});
 
 		this.editor.onKeyDown(e => {

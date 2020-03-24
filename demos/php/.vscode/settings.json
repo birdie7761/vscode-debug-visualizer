@@ -1,0 +1,8 @@
+{
+	"debugVisualizer.debugAdapterConfigurations": {
+		"phpa": {
+			"context": "watch",
+			"expressionTemplate": "${expr}"
+		}
+	}
+}

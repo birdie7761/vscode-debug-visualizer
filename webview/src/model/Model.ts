@@ -4,18 +4,27 @@ import {
 } from "debug-visualizer/src/contract";
 import { WebSocketStream } from "@hediet/typed-json-rpc-websocket";
 import { ConsoleRpcLogger } from "@hediet/typed-json-rpc";
-import { observable, action, computed, when, autorun } from "mobx";
+import { observable, action, computed, when } from "mobx";
 import { DataExtractorId } from "@hediet/debug-visualizer-data-extraction";
-import { Visualization, VisualizationId } from "../visualizers/Visualizer";
-import { knownVisualizations } from "../visualizers";
+import {
+	Visualization,
+	VisualizationId,
+	knownVisualizations,
+} from "@hediet/visualization";
 import { getApi as getVsCodeApi } from "./VsCodeApi";
 import { MonacoBridge } from "./MonacoBridge";
 import { Disposable } from "@hediet/std/disposable";
 import { startInterval } from "@hediet/std/timer";
 
 declare const window: Window & {
-	webViewData?: { serverSecret: string; serverPort: number };
+	webViewData?: {
+		serverSecret: string;
+		serverPort: number;
+		publicPath: string;
+	};
 };
+
+declare let __webpack_public_path__: string;
 
 export class Model {
 	public readonly dispose = Disposable.fn();
@@ -80,6 +89,7 @@ export class Model {
 			this.port = data.serverPort;
 			this.serverSecret = data.serverSecret;
 			this.runningMode = "webView";
+			__webpack_public_path__ = data.publicPath;
 
 			const updateTheme = () => {
 				const isLight = document.body.classList.contains(
@@ -185,6 +195,9 @@ export class Model {
 							if (!this._loading) {
 								this.state = newState;
 							}
+						},
+						setExpression: async ({ expression }) => {
+							this.setExpression(expression);
 						},
 					}
 				);
